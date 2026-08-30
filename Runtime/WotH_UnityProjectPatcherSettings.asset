@@ -1,0 +1,150 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f29d200711b44929311442db80f4c89, type: 3}
+  m_Name: WotH_UnityProjectPatcherSettings
+  m_EditorClassIdentifier: 
+  _gameName: Whisper of the House
+  _customGameName: 
+  _gameVersion: 2021.3.45
+  _pipelineType: 0
+  _dllsToCopy:
+  - key:
+    sourceName: DOTween.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: DOTweenPro.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: ThinkingAnalytics.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: ThinkingSDK.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Ak.Wwise.Api.WAAPI.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: AK.Wwise.Unity.API.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: AK.Wwise.Unity.API.WwiseTypes.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: AK.Wwise.Unity.MonoBehaviour.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: AK.Wwise.Unity.Timeline.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: ..\Plugins\x86_64\AKSoundEngine.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Sirenix.OdinInspector.Attributes.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Sirenix.OdinInspector.Modules.Unity.Addressables.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Sirenix.Serialization.Config.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Sirenix.Serialization.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Sirenix.Utilities.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Febucci.TextAnimator.Runtime.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Ookii.Dialogs.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: com.rlabrecque.steamworks.net.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: ..\Plugins\x86_64\steam_api64.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: System.Windows.Forms.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: QFSW.QC.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: Mirror.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: UIEffect.dll
+    outputPath:
+    exclude: 0
+  - key:
+    sourceName: LoopScrollRect.Runtime.dll
+    outputPath:
+    exclude: 0
+  _scriptDllFoldersToCopy: []
+  _ignoredDllPrefixes:
+  - System.
+  - UnityEngine.
+  - Unity.
+  _exactPackagesFound:
+  - name: com.unity.addressables
+    version: 1.19.19
+    dependencies:
+    - name: com.unity.modules.assetbundle
+      version: 1.0.0
+    - name: com.unity.modules.imageconversion
+      version: 1.0.0
+    - name: com.unity.modules.jsonserialize
+      version: 1.0.0
+    - name: com.unity.modules.unitywebrequest
+      version: 1.0.0
+    - name: com.unity.modules.unitywebrequestassetbundle
+      version: 1.0.0
+    - name: com.unity.scriptablebuildpipeline
+      version: 1.19.6
+    matchType: 0
+  - name: com.unity.cinemachine
+    version: 2.10.3
+    dependencies:
+    matchType: 0
+  - name: com.unity.inputsystem
+    version: 1.7.0
+    dependencies:
+    - name: com.unity.modules.uielements
+      version: 1.0.0
+    matchType: 0
+  _possiblePackagesFound: []
+  _improbablePackagesFound: []
+  _gitPackages: []

@@ -1,0 +1,18 @@
+{
+  "name": "com.skydorm.unity-woth-project-patcher",
+  "version": "0.2.0",
+  "displayName": "Whisper of the House Project Patcher",
+  "description": "A game wrapper that generates a Unity project from Whisper of the House's build that can be playable in-editor",
+  "unity": "2021.3",
+  "unityRelease": "45f2",
+  "licensesUrl": "https://choosealicense.com/licenses/gpl-3.0/",
+  "dependencies": {},
+  "devDependencies": {},
+  "samples": [],
+  "author": {
+    "name": "Skydorm",
+    "email": "",
+    "url": ""
+  },
+  "type": "library"
+}
