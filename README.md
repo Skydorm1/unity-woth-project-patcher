@@ -11,6 +11,7 @@
 
 # Table of Contents
 
+- [Recent Updates](#recent-updates)
 - [Current State](#current-state)
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
@@ -18,16 +19,15 @@
 - [Usage](#usage)
 - [FAQ](#faq)
 
-
 ## Current State
 
 This project is currently in a very early stage of development. It is able to extract the necessary game assets, move the required DLLs, and apply a number of source code patches to generate a Unity project that can be opened normally in the Unity editor without entering Safe Mode.
 
-However, the generated project is **not yet fully functional**. Many issues that occur while entering Play Mode have not been addressed yet. These can include missing assets that still need to be extracted from the game's bundles, which may require adjustments to the Asset Ripper configuration or additional asset processing (Annoying Stuff like Text Animator missing so idk i own that package thankfully so i just gonna ignore that problem atm).
+However, the generated project is **not yet fully functional**. Many issues that occur while entering Play Mode have not been addressed yet. These can include missing assets or additional asset processing (Annoying Stuff like Text Animator missing so idk i own that package thankfully so i just gonna ignore that problem atm).
 
-There are also known runtime issues, such as a crash caused by Wwise during the initialization of `SetBasePath`. This can currently be avoided by disabling the `AkInitializerCompat` GameObject.
+There are also known runtime issues, such as a crash caused by Wwise during the initialization of `SetBasePath`. This can currently be avoided by disabling the `AkInitializerCompat` GameObject. Or by not entering the Main Menu scene.
 
-The current goal is therefore to provide a **playable-in-editor project structure rather than a fully working game**. The project can be opened and worked with in Unity, but further work is required before the game can run correctly and all of its systems function as intended.
+The current goal is therefore to provide a **playable-in-editor project structure rather than a fully working game**. The project can be opened and worked with in Unity, but further work is required before the game can run correctly and all of its systems function as intended to properly produce Mods.
 
 A significant amount of work has gone into getting the project to this point, including the AssetRipper changes, wrapper adjustments, Unity project setup, and resolving the resulting compilation and initialization issues.
 
@@ -154,8 +154,8 @@ The main menu currently has an issue related to **Wwise**, so it should be avoid
 
 At this stage, there are currently two major known issues:
 
-1. **Shaders**
-2. **Text Animator**
+1. **Text Animator**
+2. **Wwise**
 
 These are the remaining major areas that still need investigation and fixing.
 
@@ -172,9 +172,7 @@ The exact object and path may vary depending on the error.
 
 ### Known Additional Issue
 
-There is also a potential issue in `SteamManager.cs`.
-
-The contents of `Awake()` need to be removed/disabled depending on the errors encountered during playmode. Otherwise it tries to open the game through steam.
+Basement and City can't be entered currently.
 
 
 ## FAQ
@@ -182,3 +180,7 @@ The contents of `Awake()` need to be removed/disabled depending on the errors en
 **Q: Why is my game crashing, when going into playmode in main menu**
 
 You have to deactivate the Object "AkInitializerCompat" in the main menu Scene.
+
+**Q: I get errors with Febucci**
+
+There is currently no workaround for that, it's the biggest hurdle atm if you don't own the package.

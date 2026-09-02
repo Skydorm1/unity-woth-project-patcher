@@ -118,33 +118,7 @@ MonoBehaviour:
   - System.
   - UnityEngine.
   - Unity.
-  _exactPackagesFound:
-  - name: com.unity.addressables
-    version: 1.19.19
-    dependencies:
-    - name: com.unity.modules.assetbundle
-      version: 1.0.0
-    - name: com.unity.modules.imageconversion
-      version: 1.0.0
-    - name: com.unity.modules.jsonserialize
-      version: 1.0.0
-    - name: com.unity.modules.unitywebrequest
-      version: 1.0.0
-    - name: com.unity.modules.unitywebrequestassetbundle
-      version: 1.0.0
-    - name: com.unity.scriptablebuildpipeline
-      version: 1.19.6
-    matchType: 0
-  - name: com.unity.cinemachine
-    version: 2.10.3
-    dependencies:
-    matchType: 0
-  - name: com.unity.inputsystem
-    version: 1.7.0
-    dependencies:
-    - name: com.unity.modules.uielements
-      version: 1.0.0
-    matchType: 0
+  _exactPackagesFound: []
   _possiblePackagesFound: []
   _improbablePackagesFound: []
   _gitPackages: []

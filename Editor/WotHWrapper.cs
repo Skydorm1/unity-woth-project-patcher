@@ -9,7 +9,13 @@ namespace Skydorm.WotHProjectPatcher.Editor {
         {
             stepPipeline.SetInputSystem(InputSystemType.Both);
 
+            stepPipeline.InsertLast(new WotHClearUpFiles());
+            stepPipeline.InsertLast(new WotHAddressables());
+            stepPipeline.InsertLast(new WotHAssetCopyStep());
+            stepPipeline.InsertLast(new WotHAddressPathChange());
+            stepPipeline.InsertLast(new WotHShaderPatchStep());
             stepPipeline.InsertLast(new WotHSourcePatchStep());
+            stepPipeline.InsertLast(new WotHFebucciStep());
         }
     }
 }

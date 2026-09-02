@@ -31,6 +31,7 @@ namespace Skydorm.WotHProjectPatcher.Editor
             PatchLightCollider2D(assetsPath);
             PatchSteam(assetsPath);
             PatchSteamDLCTools(assetsPath);
+            PatchCuteRobot(assetsPath);
             return UniTask.FromResult(StepResult.Success);
         }
 
@@ -211,81 +212,170 @@ namespace Skydorm.WotHProjectPatcher.Editor
 
         private static void PatchSteam(string assetsPath)
         {
-            PatchExact(
+            string steamManagerPath = Path.Combine(
                 assetsPath,
-                "Scripts/Assembly-CSharp/SteamManager.cs",
-                @"protected virtual void Awake()
-            {
-                if (s_instance != null)
-                {
-                    UnityEngine.Object.Destroy(base.gameObject);
-                    return;
-                }
-                s_instance = this;
-                if (s_EverInitialized)
-                {
-                    throw new Exception(""Tried to Initialize the SteamAPI twice in one session!"");
-                }
-                UnityEngine.Object.DontDestroyOnLoad(base.gameObject);
-                if (!Packsize.Test())
-                {
-                    Debug.LogError(""[Steamworks.NET] Packsize Test returned false, the wrong version of Steamworks.NET is being run in this platform."", this);
-                }
-                if (!DllCheck.Test())
-                {
-                    Debug.LogError(""[Steamworks.NET] DllCheck Test returned false, One or more of the Steamworks binaries seems to be the wrong version."", this);
-                }
-                try
-                {
-                    if (SteamAPI.RestartAppIfNecessary((AppId_t)2589500u))
-                    {
-                        Debug.Log(""[Steamworks.NET] Shutting down because RestartAppIfNecessary returned true. Steam will restart the application."");
-                        Application.Quit();
-                        return;
-                    }
-                }
-                catch (DllNotFoundException ex)
-                {
-                    Debug.LogError(""[Steamworks.NET] Could not load [lib]steam_api.dll/so/dylib. It's likely not in the correct location. Refer to the README for more details.\n"" + ex, this);
-                    Application.Quit();
-                    return;
-                }
-                m_bInitialized = SteamAPI.Init();
-                if (!m_bInitialized)
-                {
-                    Debug.LogError(""[Steamworks.NET] SteamAPI_Init() failed. Refer to Valve's documentation or the comment above this line for more information."", this);
-                    Application.Quit();
-                }
-                else
-                {
-                    s_EverInitialized = true;
-                }
-            }",
-                @"protected virtual void Awake()
-            {
-            }"
+                "Scripts/Assembly-CSharp/SteamManager.cs"
             );
 
-            PatchExact(
-                assetsPath,
-                "Scripts/Assembly-CSharp/SteamManager.cs",
-                @"protected virtual void Update()
+            if (!File.Exists(steamManagerPath))
             {
-                if (m_bInitialized)
-                {
-                    SteamAPI.RunCallbacks();
-                }
-            }",
-                @"protected virtual void Update()
-            {
-            }"
+                Debug.LogWarning(
+                    $"[WotH Wrapper] SteamManager.cs not found: {steamManagerPath}"
+                );
+
+                return;
+            }
+
+            string source = File.ReadAllText(steamManagerPath);
+
+            string patched = source;
+
+            patched = EmptyMethodBody(
+                patched,
+                "Awake"
             );
+
+            patched = EmptyMethodBody(
+                patched,
+                "Update"
+            );
+
+            if (patched != source)
+            {
+                File.WriteAllText(
+                    steamManagerPath,
+                    patched
+                );
+
+                Debug.Log(
+                    "[WotH Wrapper] Disabled SteamManager.Awake() and SteamManager.Update()."
+                );
+            }
+            else
+            {
+                Debug.Log(
+                    "[WotH Wrapper] SteamManager.Awake() and SteamManager.Update() were already patched."
+                );
+            }
 
             PatchExact(
                 assetsPath,
                 "Scripts/Assembly-CSharp/DeckKeyboardFloating.cs",
                 "SteamAPI.RunCallbacks();",
                 ""
+            );
+        }
+
+        private static string EmptyMethodBody(
+            string source,
+            string methodName)
+        {
+            string methodPattern =
+                $@"protected\s+virtual\s+void\s+{Regex.Escape(methodName)}\s*\(\s*\)";
+
+            Match match = Regex.Match(
+                source,
+                methodPattern
+            );
+
+            if (!match.Success)
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] Could not find SteamManager.{methodName}()."
+                );
+
+                return source;
+            }
+
+            int openBraceIndex = source.IndexOf(
+                '{',
+                match.Index + match.Length
+            );
+
+            if (openBraceIndex < 0)
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] Could not find opening brace of {methodName}()."
+                );
+
+                return source;
+            }
+
+            int depth = 0;
+            int closeBraceIndex = -1;
+
+            for (int i = openBraceIndex; i < source.Length; i++)
+            {
+                if (source[i] == '{')
+                {
+                    depth++;
+                }
+                else if (source[i] == '}')
+                {
+                    depth--;
+
+                    if (depth == 0)
+                    {
+                        closeBraceIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (closeBraceIndex < 0)
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] Could not find closing brace of {methodName}()."
+                );
+
+                return source;
+            }
+
+            string indentation = GetLineIndentation(
+                source,
+                match.Index
+            );
+
+            string replacement =
+                source.Substring(0, openBraceIndex + 1)
+                + "\n"
+                + indentation
+                + "}"
+                + source.Substring(closeBraceIndex + 1);
+
+            Debug.Log(
+                $"[WotH Wrapper] Emptied SteamManager.{methodName}()."
+            );
+
+            return replacement;
+        }
+
+        private static string GetLineIndentation(
+            string source,
+            int index)
+        {
+            int lineStart = source.LastIndexOf(
+                '\n',
+                Math.Max(0, index - 1)
+            );
+
+            lineStart++;
+
+            int length = 0;
+
+            while (
+                lineStart + length < source.Length &&
+                (
+                    source[lineStart + length] == ' ' ||
+                    source[lineStart + length] == '\t'
+                ))
+            {
+                length++;
+            }
+
+            return source.Substring(
+                lineStart,
+                length
             );
         }
 
@@ -435,6 +525,158 @@ namespace Skydorm.WotHProjectPatcher.Editor
                     $"[WotH Wrapper] Patched: {relativePath}"
                 );
             }
+        }
+
+        private static void PatchCuteRobot(string assetsPath)
+        {
+            string path = Path.Combine(
+                assetsPath,
+                "Scripts/Assembly-CSharp/CuteRobotContainer.cs"
+            );
+
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] CuteRobotContainer.cs not found: {path}"
+                );
+
+                return;
+            }
+
+            string source = File.ReadAllText(path);
+            string patched = source;
+
+            // Update()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.SetFloat(\"IsTimeToShowNumber\", Time.time % 15f);"
+            );
+
+            // FaceToMouse()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.SetBool(\"IsBack\", vector.y > position.y);"
+            );
+
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"Idel Face.67-100Face\");"
+            );
+
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"Idel.Idel\");"
+            );
+
+            // GetNextThing()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"GetThing.GetThing66-100%\");"
+            );
+
+            // Start()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.IgnoreInteractiveCD = true;"
+            );
+
+            // CuteRobotContainer_BeforePutUpHoldThingEventHandler()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"OnMouse.OnMouse66-100%\");"
+            );
+
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.SetBool(\"IsOnMouse\", value: true);"
+            );
+
+            // NoThingCanGet_DelRobot()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"DelSelf\");"
+            );
+
+            // CuteRobotContainer_AfterPutDownHoldThingEventHandler()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"Idel.Idel\");"
+            );
+
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.SetBool(\"IsOnMouse\", value: false);"
+            );
+
+            // OnHandThingIntoRobot()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"GetThing.GetThing66-100%\");"
+            );
+
+            // Instance_updateEventHandler()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.Play(\"TPIn.TPIN66-100%\");"
+            );
+
+            // UpdateAniInfo()
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.SetFloat(\"RemainingNumber\", 0f);"
+            );
+
+            patched = RemoveExactLine(
+                patched,
+                "ThingSelfAni.SetFloat(\"RemainingNumber\", (float)ManagerBase<SaveManager>.Instance.storeManager.ThingsOnStore.Count * 1f / (float)selfInfo.thisRobotThingMaxNum);"
+            );
+
+            if (patched != source)
+            {
+                File.WriteAllText(path, patched);
+
+                Debug.Log(
+                    "[WotH Wrapper] Patched CuteRobotContainer.cs " +
+                    "(disabled robot animation calls)."
+                );
+            }
+            else
+            {
+                Debug.Log(
+                    "[WotH Wrapper] CuteRobotContainer.cs already appears to be patched."
+                );
+            }
+        }
+
+        private static string RemoveExactLine(
+            string source,
+            string line)
+        {
+            string[] lines = source.Split(
+                new[] { "\r\n", "\n" },
+                StringSplitOptions.None
+            );
+
+            bool changed = false;
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].Trim() == line)
+                {
+                    lines[i] = "";
+                    changed = true;
+                }
+            }
+
+            if (!changed)
+            {
+                return source;
+            }
+
+            return string.Join(
+                Environment.NewLine,
+                lines
+            );
         }
 
         public void OnComplete(bool failed)
