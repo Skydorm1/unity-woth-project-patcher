@@ -31,7 +31,7 @@ namespace Skydorm.WotHProjectPatcher.Editor
             PatchLightCollider2D(assetsPath);
             PatchSteam(assetsPath);
             PatchSteamDLCTools(assetsPath);
-            PatchCuteRobot(assetsPath);
+            PatchSaveManagerEmission(assetsPath);
             return UniTask.FromResult(StepResult.Success);
         }
 
@@ -527,127 +527,6 @@ namespace Skydorm.WotHProjectPatcher.Editor
             }
         }
 
-        private static void PatchCuteRobot(string assetsPath)
-        {
-            string path = Path.Combine(
-                assetsPath,
-                "Scripts/Assembly-CSharp/CuteRobotContainer.cs"
-            );
-
-            if (!File.Exists(path))
-            {
-                Debug.LogWarning(
-                    $"[WotH Wrapper] CuteRobotContainer.cs not found: {path}"
-                );
-
-                return;
-            }
-
-            string source = File.ReadAllText(path);
-            string patched = source;
-
-            // Update()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.SetFloat(\"IsTimeToShowNumber\", Time.time % 15f);"
-            );
-
-            // FaceToMouse()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.SetBool(\"IsBack\", vector.y > position.y);"
-            );
-
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"Idel Face.67-100Face\");"
-            );
-
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"Idel.Idel\");"
-            );
-
-            // GetNextThing()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"GetThing.GetThing66-100%\");"
-            );
-
-            // Start()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.IgnoreInteractiveCD = true;"
-            );
-
-            // CuteRobotContainer_BeforePutUpHoldThingEventHandler()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"OnMouse.OnMouse66-100%\");"
-            );
-
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.SetBool(\"IsOnMouse\", value: true);"
-            );
-
-            // NoThingCanGet_DelRobot()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"DelSelf\");"
-            );
-
-            // CuteRobotContainer_AfterPutDownHoldThingEventHandler()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"Idel.Idel\");"
-            );
-
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.SetBool(\"IsOnMouse\", value: false);"
-            );
-
-            // OnHandThingIntoRobot()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"GetThing.GetThing66-100%\");"
-            );
-
-            // Instance_updateEventHandler()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.Play(\"TPIn.TPIN66-100%\");"
-            );
-
-            // UpdateAniInfo()
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.SetFloat(\"RemainingNumber\", 0f);"
-            );
-
-            patched = RemoveExactLine(
-                patched,
-                "ThingSelfAni.SetFloat(\"RemainingNumber\", (float)ManagerBase<SaveManager>.Instance.storeManager.ThingsOnStore.Count * 1f / (float)selfInfo.thisRobotThingMaxNum);"
-            );
-
-            if (patched != source)
-            {
-                File.WriteAllText(path, patched);
-
-                Debug.Log(
-                    "[WotH Wrapper] Patched CuteRobotContainer.cs " +
-                    "(disabled robot animation calls)."
-                );
-            }
-            else
-            {
-                Debug.Log(
-                    "[WotH Wrapper] CuteRobotContainer.cs already appears to be patched."
-                );
-            }
-        }
-
         private static string RemoveExactLine(
             string source,
             string line)
@@ -676,6 +555,85 @@ namespace Skydorm.WotHProjectPatcher.Editor
             return string.Join(
                 Environment.NewLine,
                 lines
+            );
+        }
+
+        private static void PatchSaveManagerEmission(string assetsPath)
+        {
+            string relativePath =
+                "Scripts/Assembly-CSharp/SaveManager.cs";
+
+            string path = Path.Combine(
+                assetsPath,
+                relativePath
+            );
+
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] SaveManager.cs not found: {path}"
+                );
+
+                return;
+            }
+
+            string source = File.ReadAllText(path);
+
+            const string marker =
+                "List<Material> list = LoadLightMaterial(NewItem.Emission);";
+
+            if (!source.Contains(marker))
+            {
+                Debug.LogWarning(
+                    "[WotH Wrapper] Could not find LoadLightMaterial marker in SaveManager.cs."
+                );
+
+                return;
+            }
+
+            const string patch =
+        @"if (NewItem.Emission == ""house"")
+            NewItem.Emission = ""House"";
+
+        if (NewItem.Emission == ""npc"")
+            NewItem.Emission = ""NPC"";
+
+        if (NewItem.Emission == ""car"")
+            NewItem.Emission = ""Car"";
+
+        ";
+
+            if (source.Contains(patch))
+            {
+                Debug.Log(
+                    "[WotH Wrapper] SaveManager Emission patch already applied."
+                );
+
+                return;
+            }
+
+            string patched =
+                source.Replace(
+                    marker,
+                    patch + marker
+                );
+
+            if (patched == source)
+            {
+                Debug.LogWarning(
+                    "[WotH Wrapper] SaveManager.cs was not changed."
+                );
+
+                return;
+            }
+
+            File.WriteAllText(
+                path,
+                patched
+            );
+
+            Debug.Log(
+                "[WotH Wrapper] Successfully patched SaveManager Emission handling."
             );
         }
 

@@ -21,17 +21,17 @@
 
 ## Current State
 
-This project is currently in a very early stage of development. It is able to extract the necessary game assets, move the required DLLs, and apply a number of source code patches to generate a Unity project that can be opened normally in the Unity editor without entering Safe Mode.
+This project is currently in a early stage of development. It is able to extract the necessary game assets, move the required DLLs, and apply a number of source code patches to generate a Unity project that can be opened normally in the Unity editor without entering Safe Mode.
 
-However, the generated project is **not yet fully functional**. Many issues that occur while entering Play Mode have not been addressed yet. These can include missing assets or additional asset processing (Annoying Stuff like Text Animator missing so idk i own that package thankfully so i just gonna ignore that problem atm).
+However, the generated project might **not yet be fully functional**. Many issues that occur while entering Play Mode have been fixed. If you own Febucci Package, you are able to decorate your House in the tutorial and enter the city and walk around. (More hasn't been tested atm)
 
-There are also known runtime issues, such as a crash caused by Wwise during the initialization of `SetBasePath`. This can currently be avoided by disabling the `AkInitializerCompat` GameObject. Or by not entering the Main Menu scene.
+There are known runtime issues, such as a crash caused by Wwise during the initialization of `SetBasePath`. This can currently be avoided by disabling the `AkInitializerCompat` GameObject. Or by not entering the Main Menu scene.
 
 The current goal is therefore to provide a **playable-in-editor project structure rather than a fully working game**. The project can be opened and worked with in Unity, but further work is required before the game can run correctly and all of its systems function as intended to properly produce Mods.
 
 A significant amount of work has gone into getting the project to this point, including the AssetRipper changes, wrapper adjustments, Unity project setup, and resolving the resulting compilation and initialization issues.
 
-At this point, I'm taking a break from the project. I also need to prioritize my bachelor's thesis, as time is becoming increasingly limited ,_,
+At this point, I'm taking a break from the project (That's what he said and still works on it lol). I also need to prioritize my bachelor's thesis, as time is becoming increasingly limited ,_,
 
 The project has been tested through multiple fresh Unity project setups and a considerable amount of time has already gone into investigating and fixing the issues introduced by the AssetRipper changes.
 
@@ -71,12 +71,11 @@ Make sure you have the following before using the tool in any way:
 
 Create a new Unity project with the above requirements before getting started.
 
-You will need to install three packages in sequence here:
+You will need to install two packages in sequence here:
 
 - Unity Project Patcher: `https://github.com/nomnomab/unity-project-patcher.git`
   - [Can be disabled](#disabling-bepinex-usage)
 - This project
-- Unity Project Patcher BepInEx: `https://github.com/Kesomannen/unity-project-patcher-bepinex.git#update-mono-cecil`
 
 ### Installing the Unity Project Patcher core
 
@@ -103,6 +102,9 @@ Open the tool window `Tools > Unity Project Patcher > Open Window` and press the
 
 Otherwise, follow the steps at https://github.com/nomnomab/unity-project-patcher-bepinex
 
+> [!IMPORTANT]  
+> Not Required
+
 #### Disabling BepInEx Usage
 
 If you don't want to use plugins, then follow the steps at https://github.com/nomnomab/unity-project-patcher-bepinex#disabling-this-package
@@ -112,13 +114,12 @@ If you don't want to use plugins, then follow the steps at https://github.com/no
 The tool window can be opened via `Tools > Unity Project Patcher > Open Window`
 
 1. Open the **Unity Project Patcher** window and press **Run**.
-2. You will be prompted to download three required packages. Confirm by pressing **Yes**.
-3. If Unity asks you to restart for the **Input System**, select **No**.
-4. If Unity asks whether to enter **Safe Mode**, select **Ignore** and allow the project to open normally.
+2. If Unity asks you to restart for the **Input System**, select **Yes**.
+3. If Unity asks whether to enter **Safe Mode**, select **Ignore** and allow the project to open normally. This will happen 2 times throughout the whole process. Make sure to press ignore, otherwise it will not continue till you do so.
 
 > [!IMPORTANT]  
-> This tool mostly supports patching an already patched project, although this can lead to broken assets.
-> So make sure you back up your project beforehand.
+> Keep your mods in a seperate folder, so if a mendatory update is pushed for the game that breaks mods, you can move important folders with you.
+> You probably need to patch the Project from the start if that happens.
 
 Estimated patch durations:
 
@@ -126,27 +127,7 @@ Estimated patch durations:
 
 These can vary wildly depending on system speed and project size.
 
-The current wrapper setup is not fully compatible with the default AssetRipper workflow.
-
-For this project, we use a **custom AssetRipper build** that extracts all scripts and places them inside the project's `Scripts` folder.
-
-After extraction:
-
-* Delete all folders and files inside the `Scripts` folder **except `Assembly-CSharp`**.
-* This should remove the majority of the compilation errors caused by duplicate or incompatible extracted files.
-
-If compilation errors show up, fix them first before continuing with the next step.
-
-Next, create the Addressables configuration:
-
-1. Open:
-   `Window > Asset Management > Addressables > Groups`
-2. Select **Create Addressables Settings**.
-3. Unity will ask whether you want to automatically convert the legacy AssetBundle setup.
-4. Select **Convert**.
-5. The conversion may take some time. Let Unity finish the process before continuing.
-
-After this step, most of the major setup issues should be resolved.
+For this project, we use a **custom AssetRipper build** that makes use of the newest version of AssetRipper 2.0, while the one in the REPO wrapper was custom and 1.3 i think.
 
 The project should now be able to enter Play Mode, **as long as you start from the `InGameLevelEditor` scene**.
 
@@ -159,21 +140,9 @@ At this stage, there are currently two major known issues:
 
 These are the remaining major areas that still need investigation and fixing.
 
-### Addressables Issues
-
-If you encounter an Addressables-related error where the game is unable to locate a required object:
-
-1. Find the object referenced by the error.
-2. Add it to the **Default Group** in:
-   `Window > Asset Management > Addressables > Groups`
-3. If necessary, update the corresponding path/reference in the code.
-
-The exact object and path may vary depending on the error.
-
 ### Known Additional Issue
 
-Basement and City can't be entered currently.
-
+Currently Shaders need adjustment, otherwise i haven't ran into any other issues.
 
 ## FAQ
 

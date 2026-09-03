@@ -157,6 +157,10 @@ MonoBehaviour:
     sourceName: Scriptable
     outputPath: Scriptable
     exclude: 0
+  - key: Animation
+    sourceName: Animation
+    outputPath: Animation
+    exclude: 0
   _foldersToCopy:
   - AnimationClip
   - AnimatorController
@@ -194,6 +198,7 @@ MonoBehaviour:
   - Script
   - URP
   - Scriptable
+  - Animation
   _filesToExcludeFromCopy:
   - Localization\Locales\*
   _foldersToExcludeFromRead:

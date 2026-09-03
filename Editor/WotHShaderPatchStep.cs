@@ -49,8 +49,8 @@ namespace Skydorm.WotHProjectPatcher.Editor
 
             AddMaterial(
                 assetsPath,
-                "Arts/Meterials/house",
-                "house"
+                "Arts/Meterials/House",
+                "House"
             );
 
             AddMaterial(
@@ -67,14 +67,14 @@ namespace Skydorm.WotHProjectPatcher.Editor
 
             AddMaterial(
                 assetsPath,
-                "Arts/Meterials/car",
-                "car"
+                "Arts/Meterials/Car",
+                "Car"
             );
 
             AddMaterial(
                 assetsPath,
-                "Arts/Meterials/npc",
-                "npc"
+                "Arts/Meterials/NPC",
+                "NPC"
             );
         }
 
