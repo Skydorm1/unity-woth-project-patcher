@@ -23,19 +23,11 @@
 
 This project is currently in a early stage of development. It is able to extract the necessary game assets, move the required DLLs, and apply a number of source code patches to generate a Unity project that can be opened normally in the Unity editor without entering Safe Mode.
 
-However, the generated project might **not yet be fully functional**. Many issues that occur while entering Play Mode have been fixed. If you own Febucci Package, you are able to decorate your House in the tutorial and enter the city and walk around. (More hasn't been tested atm)
+However, the generated project might **not yet be fully functional**. Many issues that occur while entering Play Mode have been fixed. If you own Febucci Package, you don't really have any main issues, except no audio and minor inconveniences like shaders that need to be adjusted.
+
+However, the available project data is already sufficient to start experimenting with mods and to learn how the game is structured.  
 
 There are known runtime issues, such as a crash caused by Wwise during the initialization of `SetBasePath`. This can currently be avoided by disabling the `AkInitializerCompat` GameObject. Or by not entering the Main Menu scene.
-
-The current goal is therefore to provide a **playable-in-editor project structure rather than a fully working game**. The project can be opened and worked with in Unity, but further work is required before the game can run correctly and all of its systems function as intended to properly produce Mods.
-
-A significant amount of work has gone into getting the project to this point, including the AssetRipper changes, wrapper adjustments, Unity project setup, and resolving the resulting compilation and initialization issues.
-
-At this point, I'm taking a break from the project (That's what he said and still works on it lol). I also need to prioritize my bachelor's thesis, as time is becoming increasingly limited ,_,
-
-The project has been tested through multiple fresh Unity project setups and a considerable amount of time has already gone into investigating and fixing the issues introduced by the AssetRipper changes.
-
-If you continue working on the wrapper and run into additional **major issues**, feel free to document them. I would appreciate keeping track of anything that prevents the project from reaching a fully playable state.
 
 ## About the Project
 
@@ -58,8 +50,7 @@ Make sure you have the following before using the tool in any way:
   - To run Asset Ripper
 
 > [!IMPORTANT]  
-> The Project requires up to 30GB of free Space.
-> (No i don't know why its so much)
+> The Project requires up to ~17GB of free Space.
 
 
 ## Installation
@@ -96,19 +87,6 @@ You will need to install two packages in sequence here:
 
 The same steps as previously, just with `https://github.com/Skydorm1/unity-woth-project-patcher.git`
 
-### Installing the BepInEx Wrapper
-
-Open the tool window `Tools > Unity Project Patcher > Open Window` and press the `Install BepInEx` button.
-
-Otherwise, follow the steps at https://github.com/nomnomab/unity-project-patcher-bepinex
-
-> [!IMPORTANT]  
-> Not Required
-
-#### Disabling BepInEx Usage
-
-If you don't want to use plugins, then follow the steps at https://github.com/nomnomab/unity-project-patcher-bepinex#disabling-this-package
-
 ## Usage
 
 The tool window can be opened via `Tools > Unity Project Patcher > Open Window`
@@ -131,14 +109,14 @@ For this project, we use a **custom AssetRipper build** that makes use of the ne
 
 The project should now be able to enter Play Mode, **as long as you start from the `InGameLevelEditor` scene**.
 
-The main menu currently has an issue related to **Wwise**, so it should be avoided for now.
+The main menu currently has an issue related to **Wwise**, so it should be avoided for now, or just disable "AkInitializerCompat" object, than it should load.
 
-At this stage, there are currently two major known issues:
+There are currently two major known issues:
 
 1. **Text Animator**
 2. **Wwise**
 
-These are the remaining major areas that still need investigation and fixing.
+These are the remaining major areas that still need investigation and fixing. Tho I'm working on some tools to just **add** custom stuff easily. So that you only have to prepare the files in unity, build the bundle and switch to the game, without ever touching playmode.
 
 ### Known Additional Issue
 
