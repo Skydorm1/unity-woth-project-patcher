@@ -23,6 +23,7 @@ namespace Skydorm.WotHProjectPatcher.Editor
             
             SetMaterialShaders(assetsPath);
             AddMaterials(assetsPath);
+            FixSloaneShaders();
             return UniTask.FromResult(StepResult.Success);
         }
 
@@ -249,6 +250,76 @@ namespace Skydorm.WotHProjectPatcher.Editor
 
             Debug.Log(
                 $"[WotH Wrapper] Added to Addressables group '{groupName}': {assetPath}"
+            );
+        }
+
+        private static void FixSloaneShaders()
+        {
+            const string targetPrefix = "Sloane/";
+            const string replacementShaderName = "Sprites/Default";
+
+            Debug.Log("[WotH Wrapper] Fixing Sloane shaders...");
+
+            Shader replacementShader = Shader.Find(replacementShaderName);
+
+            if (replacementShader == null)
+            {
+                Debug.LogError(
+                    $"[WotH Wrapper] Shader '{replacementShaderName}' could not be found."
+                );
+
+                return;
+            }
+
+            string[] materialGuids = AssetDatabase.FindAssets("t:Material");
+
+            int checkedCount = 0;
+            int fixedCount = 0;
+
+            foreach (string guid in materialGuids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+
+                Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+
+                if (material == null)
+                    continue;
+
+                checkedCount++;
+
+                if (material.shader == null)
+                    continue;
+
+                string shaderName = material.shader.name;
+
+                if (shaderName.StartsWith(
+                        targetPrefix,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.Log(
+                        $"[WotH Wrapper] Fix Shader: {path}\n" +
+                        $"    {shaderName} -> {replacementShaderName}"
+                    );
+
+                    Undo.RecordObject(
+                        material,
+                        "Fix Sloane Shader"
+                    );
+
+                    material.shader = replacementShader;
+
+                    EditorUtility.SetDirty(material);
+
+                    fixedCount++;
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+
+            Debug.Log(
+                "[WotH Wrapper] Sloane shader fix complete.\n" +
+                $"Materials checked: {checkedCount}\n" +
+                $"Materials fixed: {fixedCount}"
             );
         }
 

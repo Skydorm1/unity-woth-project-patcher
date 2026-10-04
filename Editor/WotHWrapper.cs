@@ -15,7 +15,10 @@ namespace Skydorm.WotHProjectPatcher.Editor {
             stepPipeline.InsertLast(new WotHAddressPathChange());
             stepPipeline.InsertLast(new WotHShaderPatchStep());
             stepPipeline.InsertLast(new WotHSourcePatchStep());
+            stepPipeline.InsertLast(new WotHImportPackageStep());
+            stepPipeline.InsertLast(new WotHAddCategoriesToBag());
             stepPipeline.InsertLast(new WotHFebucciStep());
+            stepPipeline.InsertLast(new WotHFinalStep());
         }
     }
 }

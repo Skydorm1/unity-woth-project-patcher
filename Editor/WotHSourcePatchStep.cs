@@ -32,6 +32,9 @@ namespace Skydorm.WotHProjectPatcher.Editor
             PatchSteam(assetsPath);
             PatchSteamDLCTools(assetsPath);
             PatchSaveManagerEmission(assetsPath);
+            PatchGameManager(assetsPath);
+            PatchMoneyManager(assetsPath);
+            PatchUIManager(assetsPath);
             return UniTask.FromResult(StepResult.Success);
         }
 
@@ -82,6 +85,13 @@ namespace Skydorm.WotHProjectPatcher.Editor
                 "Scripts/Assembly-CSharp/BagPanel.cs",
                 "private TabButton tabButton;",
                 "private Water.UI.TabButton tabButton;"
+            );
+
+            PatchExact(
+                assetsPath,
+                "Scripts/Assembly-CSharp/BagPanel.cs",
+                "private TabButton shopModel;",
+                "private Water.UI.TabButton shopModel;"
             );
 
             PatchExact(
@@ -634,6 +644,175 @@ namespace Skydorm.WotHProjectPatcher.Editor
 
             Debug.Log(
                 "[WotH Wrapper] Successfully patched SaveManager Emission handling."
+            );
+        }
+
+        private static void PatchGameManager(string assetsPath)
+        {
+            const string relativePath =
+                "Scripts/Assembly-CSharp/GameManager.cs";
+
+            string path = Path.Combine(assetsPath, relativePath);
+
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] GameManager.cs not found: {path}"
+                );
+
+                return;
+            }
+
+            string source = File.ReadAllText(path);
+
+            const string patch =
+                "        ManagerBase<StageSave>.Instance.HouseName = \"NpcQuest16x16\";\n" +
+                "        ManagerBase<StageSave>.Instance.SaveName = \"NpcQuest16x16_Room\";";
+
+            if (source.Contains(patch))
+            {
+                Debug.Log(
+                    "[WotH Wrapper] GameManager.Start() patch already applied."
+                );
+
+                return;
+            }
+
+            Match startMatch = Regex.Match(
+                source,
+                @"private\s+void\s+Start\s*\(\s*\)\s*\{"
+            );
+
+            if (!startMatch.Success)
+            {
+                Debug.LogWarning(
+                    "[WotH Wrapper] Could not find GameManager.Start()."
+                );
+
+                return;
+            }
+
+            int insertIndex = startMatch.Index + startMatch.Length;
+
+            string patched =
+                source.Substring(0, insertIndex) +
+                Environment.NewLine +
+                patch +
+                source.Substring(insertIndex);
+
+            File.WriteAllText(path, patched);
+
+            Debug.Log(
+                "[WotH Wrapper] Successfully patched GameManager.Start(): " +
+                "HouseName=NpcQuest16x16, SaveName=NpcQuest16x16_Room."
+            );
+        }
+
+        private static void PatchMoneyManager(string assetsPath)
+        {
+            const string relativePath =
+                "Scripts/Assembly-CSharp/MoneyManager.cs";
+
+            string path = Path.Combine(assetsPath, relativePath);
+
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] MoneyManager.cs not found: {path}"
+                );
+
+                return;
+            }
+
+            string source = File.ReadAllText(path);
+
+            const string original =
+                "\t\t\t//ManagerBase<UIManager>.Instance.OpenPanel<PopUpPanel>().EnqueuePopUp(new PopContent(\"<bounce>\" + LocalizationTools.GetTermTranslation(\"UI/代金券\") + \"</bounce>\", camPileUp: true, ChangeNum));";
+
+            const string unCommented =
+                "\t\t\tManagerBase<UIManager>.Instance.OpenPanel<PopUpPanel>().EnqueuePopUp(new PopContent(\"<bounce>\" + LocalizationTools.GetTermTranslation(\"UI/代金券\") + \"</bounce>\", camPileUp: true, ChangeNum));";
+
+            if (source.Contains(original))
+            {
+                Debug.Log(
+                    "[WotH Wrapper] MoneyManager PopUp call is already commented out."
+                );
+
+                return;
+            }
+
+            if (!source.Contains(unCommented))
+            {
+                Debug.LogWarning(
+                    "[WotH Wrapper] Could not find MoneyManager PopUp call."
+                );
+
+                return;
+            }
+
+            string patched = source.Replace(
+                unCommented,
+                original
+            );
+
+            File.WriteAllText(path, patched);
+
+            Debug.Log(
+                "[WotH Wrapper] Successfully commented out MoneyManager PopUp call."
+            );
+        }
+
+        private static void PatchUIManager(string assetsPath)
+        {
+            const string relativePath =
+                "Scripts/Assembly-CSharp/UIManager.cs";
+
+            string path = Path.Combine(assetsPath, relativePath);
+
+            if (!File.Exists(path))
+            {
+                Debug.LogWarning(
+                    $"[WotH Wrapper] UIManager.cs not found: {path}"
+                );
+
+                return;
+            }
+
+            string source = File.ReadAllText(path);
+
+            const string original =
+                "\t\t\t//OpenPanel<PopUpPanel>(null, \"Assets/WhisperoftheHouse/Game/Prafab/UI/Panels/PopUpPanel.prefab\", PanelPos.Front);";
+
+            const string unCommented =
+                "\t\t\tOpenPanel<PopUpPanel>(null, \"Assets/WhisperoftheHouse/Game/Prafab/UI/Panels/PopUpPanel.prefab\", PanelPos.Front);";
+
+            if (source.Contains(original))
+            {
+                Debug.Log(
+                    "[WotH Wrapper] UIManager PopUp call is already commented out."
+                );
+
+                return;
+            }
+
+            if (!source.Contains(unCommented))
+            {
+                Debug.LogWarning(
+                    "[WotH Wrapper] Could not find UIManager PopUp call."
+                );
+
+                return;
+            }
+
+            string patched = source.Replace(
+                unCommented,
+                original
+            );
+
+            File.WriteAllText(path, patched);
+
+            Debug.Log(
+                "[WotH Wrapper] Successfully commented out UIManager PopUp call."
             );
         }
 
